@@ -1,0 +1,28 @@
+Azure Sentinel SIEM Script
+
+Description:
+This script is designed to extract detailed logs related to failed RDP attempts and gather geolocation data. Additionally, the script aids in the creation of a map in Azure Sentinel to visually represent these RDP attempt origins based on geolocation data.
+
+Script:
+
+FAILED_RDP_WITH_GEO_CL
+| extend username = extract@"username:([^,]+)", 1, RawData),
+timestamp = extract@"timestamp:([^,]+)", 1, RawData),
+latitude = extract@"latitude:([^I+)", 1, RawData),
+longitude = extract@"longitude: ([^,]+)", 1, RawData),
+sourcehost = extract(@"sourcehost:([^]+)", 1, RawData),
+state = extract(@"state:([^]+)", 1, RawData),
+label = extract(@"label:([^]+)", 1, RawData),
+destination = extract (@"destinationhost: ([^]+)", 1, RawData),
+country = extract (@"country:([^]+)", 1, RawData)
+| where destination != "samplehost"
+where sourcehost!= ""
+| summarize event_count=count() by latitude, longitude, sourcehost, label, destination, country
+
+Usage:
+1. Extracting Logs: Run the script to gather and process detailed logs related to failed RDP attempts.
+2. Creating a Map in Azure Sentinel: Use the script to retrieve and format geolocation data suitable for creating a map in Azure Sentinel to visualize RDP attempt origins.
+
+Note:
+Ensure that all necessary configurations and permissions are in place before running this script. Adjustments might be required based on specific Azure Sentinel versions and configurations.
+
